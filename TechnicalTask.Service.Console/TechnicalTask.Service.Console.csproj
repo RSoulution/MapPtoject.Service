@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SignalRNotifier.cs~RF155ad7c7.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\TechnicalTask.Entities\TechnicalTask.Entities.csproj" />
+    <ProjectReference Include="..\TechnicalTask.Service.DAL\TechnicalTask.Service.DAL.csproj" />
+    <ProjectReference Include="..\TechnicalTask.Service.Stub\TechnicalTask.Service.Stub.csproj" />
+  </ItemGroup>
+
+</Project>
