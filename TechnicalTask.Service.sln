@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechnicalTask.Service.DAL",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechnicalTask.Service.Stub", "TechnicalTask.Service.Stub\TechnicalTask.Service.Stub.csproj", "{98F41B25-EF9F-45F0-BC60-BF8726E71A0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechnicalTask.Entities", "..\TechnicalTask.Entities\TechnicalTask.Entities.csproj", "{7DC87025-AFB2-BCB4-EE2F-48B58527C844}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechnicalTask.Entities", "TechnicalTask.Entities\TechnicalTask.Entities.csproj", "{529A7200-5934-3B02-8BCA-BEA8B6E5FDA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{98F41B25-EF9F-45F0-BC60-BF8726E71A0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98F41B25-EF9F-45F0-BC60-BF8726E71A0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98F41B25-EF9F-45F0-BC60-BF8726E71A0B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7DC87025-AFB2-BCB4-EE2F-48B58527C844}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7DC87025-AFB2-BCB4-EE2F-48B58527C844}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7DC87025-AFB2-BCB4-EE2F-48B58527C844}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7DC87025-AFB2-BCB4-EE2F-48B58527C844}.Release|Any CPU.Build.0 = Release|Any CPU
+		{529A7200-5934-3B02-8BCA-BEA8B6E5FDA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{529A7200-5934-3B02-8BCA-BEA8B6E5FDA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{529A7200-5934-3B02-8BCA-BEA8B6E5FDA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{529A7200-5934-3B02-8BCA-BEA8B6E5FDA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

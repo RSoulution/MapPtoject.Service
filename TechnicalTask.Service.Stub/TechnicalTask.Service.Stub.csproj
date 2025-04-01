@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\TechnicalTask.Entities\TechnicalTask.Entities.csproj" />
+    <ProjectReference Include="..\TechnicalTask.Entities\TechnicalTask.Entities.csproj" />
     <ProjectReference Include="..\TechnicalTask.Service.DAL\TechnicalTask.Service.DAL.csproj" />
   </ItemGroup>
 

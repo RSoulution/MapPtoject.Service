@@ -16,9 +16,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\TechnicalTask.Entities\TechnicalTask.Entities.csproj" />
+    <ProjectReference Include="..\TechnicalTask.Entities\TechnicalTask.Entities.csproj" />
     <ProjectReference Include="..\TechnicalTask.Service.DAL\TechnicalTask.Service.DAL.csproj" />
     <ProjectReference Include="..\TechnicalTask.Service.Stub\TechnicalTask.Service.Stub.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="SQLiteDB.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
