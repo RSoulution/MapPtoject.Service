@@ -31,7 +31,7 @@ internal class Program
             logging.AddDebug();
         });
         builder.Services.AddSingleton<DatabaseService>(); //Оголошуємо роботу з БД
-        builder.Services.AddHostedService<ConsoleReader>(); //Процес для вводу з консолі об'єктів на пропуск
+        //builder.Services.AddHostedService<ConsoleReader>(); //Процес для вводу з консолі об'єктів на пропуск
         builder.Services.AddHostedService<SignalRNotifier>(); //Фоновий процес для розсилання всіх об'єктів по групам 
         builder.Services.AddHostedService<ObjectsMover>(); //Процес для переміщення об'єктів
         builder.WebHost.UseUrls("http://localhost:5034");
