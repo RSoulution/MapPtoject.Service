@@ -4,47 +4,38 @@ using TechnicalTask.Service.DAL;
 
 namespace TechnicalTask.Service.Stub
 {
-    public class ConsoleReader : BackgroundService //Фоновий сервіс для ручного пропуску відправки певних об'єктів в демонстраційних цілях
+    public class ConsoleReader : BackgroundService //Background service for manually skipping sending certain objects for demonstration purposes
     {
         DatabaseService _databaseService;
         ILogger<ConsoleReader> _logger;
-        public static List<int> ints = new List<int>(); //Глобальний список Id об'єктів, які треба пропустити
-        public ConsoleReader(DatabaseService databaseService, ILogger<ConsoleReader> logger) 
+        ISkipListManager _skipListManager;
+        public ConsoleReader(DatabaseService databaseService, ILogger<ConsoleReader> logger, ISkipListManager consoleInputSkipList) 
         { 
             _databaseService = databaseService;
             _logger = logger;
+            _skipListManager = consoleInputSkipList;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                List<int> ints = _skipListManager.GetAll();
                 if (ints.Count == 0)
                     Console.Write("Enter the IDs of the objects whose data does not need to be transferred -> ");
                 else
                 {
-                    string op = "";
-                    foreach (int i in ints)
-                        op += i + ", ";
-                    Console.Write(op + " -> ");
+                    Console.WriteLine(string.Join(", ", ints)+" -> ");
                 }
 
-                try //Відловлюємо помилки вводу в консоль
-                {
-                    var input = Console.ReadLine().Split(',');
-                    foreach (var line in input)
-                    {
-                        var i = int.Parse(line);
-                        if (!ints.Contains(i))
-                            ints.Add(i);
-                        else
-                            ints.Remove(i);
-                    }
-                    await Task.Delay(1000, stoppingToken);
+                var parts = Console.ReadLine().Split(',', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var part in parts) {
+                    int.TryParse(part.Trim(), out int id);
+                    if (_skipListManager.ShouldSkip(id))
+                        _skipListManager.Remove(id);
+                    else
+                        _skipListManager.Add(id);
                 }
-                catch (Exception ex)
-                {
-                    Console.Write(ex.ToString());
-                }
+                await Task.Delay(1000, stoppingToken);
             }
         }
     }

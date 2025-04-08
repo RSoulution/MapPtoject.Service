@@ -3,7 +3,7 @@ using TechnicalTask.Entities;
 
 namespace TechnicalTask.Service.Stub
 {
-    public class DBFiller //Клас для автоматичного заповнення бази данних
+    public class DBFiller //Class for automatic database filling
     {
         DatabaseService databaseService;
         Random random = new Random();
@@ -12,12 +12,12 @@ namespace TechnicalTask.Service.Stub
             this.databaseService = databaseService;
         }
 
-        public void FillTables(int countKeys, int countObjs)
+        public void FillTables(int countKeys, int countObjs, int minKeys, int maxKeys)
         {
             
             for (int i = 0; i < countKeys; i++)
             {
-                if (i == 0) //Перший ключ буде мати всі об'єкти
+                if (i == 0) //The first key will have all the objects
                 {
                     databaseService.AddKey(GenerateRandomString(8));
                     for (int j = 0; j < countObjs; j++)
@@ -33,7 +33,7 @@ namespace TechnicalTask.Service.Stub
                         i--;
                         continue;
                     }
-                    for (int j = 0; j < random.Next(3, 11); j++) //Можна задати кількість об'єктів на один ключ
+                    for (int j = 0; j < random.Next(minKeys, maxKeys); j++) //You can set the number of objects per key
                     {
                         if (!databaseService.ConnectObjAndKey(i+1, random.Next(1, countObjs+1)))
                             j--;
@@ -47,7 +47,7 @@ namespace TechnicalTask.Service.Stub
 
         }
 
-        string GenerateRandomString(int length) //Створення рандомних ключів
+        string GenerateRandomString(int length) //Generating random keys
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             return new string(Enumerable.Repeat(chars, length)

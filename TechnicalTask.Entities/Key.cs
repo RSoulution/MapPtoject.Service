@@ -1,6 +1,6 @@
 ﻿namespace TechnicalTask.Entities
 {
-    public class Key //сутність ключа з БД
+    public class Key //the essence of the key from the database
     {
         public int Id { get; }
         public string Value {  get; }

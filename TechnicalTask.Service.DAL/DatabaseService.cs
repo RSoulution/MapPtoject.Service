@@ -1,21 +1,25 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using TechnicalTask.Entities;
+using Microsoft.Extensions.Options;
+using TechnicalTask.Service.DAL.Settings;
 
 namespace TechnicalTask.Service.DAL
 {
-    public class DatabaseService //Клас для роботи з БД
+    public class DatabaseService //Class for working with the database
     {
-        private const string ConnectionString = "Data Source=SQLiteDB.db";
+        private string ConnectionString = "Data Source=SQLiteDB.db";
         private readonly ILogger<DatabaseService> _logger;
 
-        public DatabaseService(ILogger<DatabaseService> logger)
+        public DatabaseService(ILogger<DatabaseService> logger, IOptions<SQLiteSettings> options)
         {
             _logger = logger;
+            ConnectionString = options.Value.ConnectionString;
+
             EnsureDatabaseCreated();
         }
 
-        private void EnsureDatabaseCreated()  //Перевірка та сворення таблиць
+        private void EnsureDatabaseCreated()  //Checking and creating tables
         {
             ExecuteNonQuery(@"
                 CREATE TABLE IF NOT EXISTS Keys (
@@ -35,14 +39,14 @@ namespace TechnicalTask.Service.DAL
                 );");
         }
 
-        public bool AddKey(string keyValue) //Додати ключ за значенням
+        public bool AddKey(string keyValue) //Add key by value
         { 
             return ExecuteNonQuery("INSERT INTO Keys (Value) VALUES (@Value);", (cmd) => cmd.Parameters.AddWithValue("@Value", keyValue)); 
         } 
 
-        public bool AddKey(Key key) => AddKey(key.Value); //Додати ключ за екземпляром (Id не важливий, поле Автоінкремент)
+        public bool AddKey(Key key) => AddKey(key.Value); //Add key by instance (Id is not important, field is Autoincrement)
 
-        public bool AddObject(EntObject entityObject) //Додати об'єкт за екземпляром (Id не важливий, поле Автоінкремент)
+        public bool AddObject(EntObject entityObject) //Add object by instance (Id is not important, field is Autoincrement)
         {
             if (!IsValidObject(entityObject)) return false;
 
@@ -54,7 +58,7 @@ namespace TechnicalTask.Service.DAL
                 });
         }
 
-        public bool ConnectObjAndKey(int keyId, int objId) //Додати зв'язок між ключем та об'єктом в суміжну таблицю
+        public bool ConnectObjAndKey(int keyId, int objId) //Add a relationship between a key and an object in a related table
         {
             if (ExecuteScalar<int>("SELECT COUNT(*) FROM KeysToObjs WHERE Id_Key = @KeyId AND Id_Obj = @ObjId;",
                 (cmd) => {
@@ -70,14 +74,14 @@ namespace TechnicalTask.Service.DAL
                 });
         }
 
-        public int GetKeyCount() => ExecuteScalar<int>("SELECT COUNT(*) FROM Keys;"); //Отримати кількість ключів в таблиці
+        public int GetKeyCount() => ExecuteScalar<int>("SELECT COUNT(*) FROM Keys;"); //Get the number of keys in a table
 
-        public List<Key> GetAllKeys() => ExecuteQuery("SELECT Id, Value FROM Keys;", (reader) => new Key(reader.GetInt32(0), reader.GetString(1))); //Отримати всі ключі з таблиці
+        public List<Key> GetAllKeys() => ExecuteQuery("SELECT Id, Value FROM Keys;", (reader) => new Key(reader.GetInt32(0), reader.GetString(1))); //Get all keys from a table
 
-        public List<EntObject> GetAllObjects() => ExecuteQuery("SELECT Id, Azimuth, Latitude, Longitude FROM Objects;", //Отримати всі об'єкти
+        public List<EntObject> GetAllObjects() => ExecuteQuery("SELECT Id, Azimuth, Latitude, Longitude FROM Objects;", //Get all objects
             (reader) => new EntObject(reader.GetInt32(0), reader.GetDouble(1), reader.GetDouble(2), reader.GetDouble(3)));
 
-        public void UpdateObject(EntObject entityObject) //Змінити об'єкт в таблиці
+        public void UpdateObject(EntObject entityObject) //Change object in table
         {
             ExecuteNonQuery(@"UPDATE Objects SET Azimuth = @Azimuth, Latitude = @Latitude, Longitude = @Longitude WHERE Id = @Id;",
                 (cmd) => {
@@ -88,12 +92,12 @@ namespace TechnicalTask.Service.DAL
                 });
         }
 
-        public void ClearTables() //Видалити всі таблиці
+        public void ClearTables() //Delete all tables
         {
             ExecuteNonQuery(@"DROP TABLE IF EXISTS Keys; DROP TABLE IF EXISTS Objects; DROP TABLE IF EXISTS KeysToObjs;");
         }
 
-        private bool IsValidObject(EntObject obj) //Перевірити об'єкт на відповідність
+        private bool IsValidObject(EntObject obj) //Check the object for compliance
         {
             return obj.Azimuth >= 0 && obj.Azimuth <= 360 && obj.Longitude >= -180 && obj.Longitude <= 180 && obj.Latitude >= -90 && obj.Latitude <= 90;
         }
@@ -140,7 +144,7 @@ namespace TechnicalTask.Service.DAL
             return list;
         }
 
-        public List<Key> GetKeysByObj(int obj_id) //Отримати всі ключі, що пов'язані з об'єктом
+        public List<Key> GetKeysByObj(int obj_id) //Get all keys associated with an object
         {
             var keys = new List<Key>();
             using var connection = new SqliteConnection(ConnectionString);
@@ -160,7 +164,7 @@ namespace TechnicalTask.Service.DAL
 
         public List<Key> GetKeysByObj(EntObject entityObject) => GetKeysByObj(entityObject.Id); 
 
-        public List<string> GetAllKeysValue() //Отримати значення всіх ключів
+        public List<string> GetAllKeysValue() //Get the values ​​of all keys
         {
             var keys = new List<string>();
             using var connection = new SqliteConnection(ConnectionString);

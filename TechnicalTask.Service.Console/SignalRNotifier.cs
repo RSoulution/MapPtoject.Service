@@ -5,48 +5,53 @@ using TechnicalTask.Service.Console.Hubs;
 using TechnicalTask.Service.DAL;
 using TechnicalTask.Entities;
 using TechnicalTask.Service.Stub;
+using Microsoft.Extensions.Options;
+using TechnicalTask.Service.Console.Settings;
+using TechnicalTask.Service.Stub.Settings;
 
 namespace TechnicalTask.Service.Console
 {
-    public class SignalRNotifier : BackgroundService //Фоновий сервіс, який відправляє всі об'єкти в відповідні групи згідно БД
+    public class SignalRNotifier : BackgroundService //Background service that sends all objects to the appropriate groups according to the database
     {
         private readonly IHubContext<MainHub> _hubContext;
         private readonly DatabaseService _databaseService;
         private readonly ILogger<SignalRNotifier> _logger;
-        private List<EntObject> objs;
+        private List<EntObject> _objs;
+        ISkipListProvider _skipListProvider;
+        private readonly IOptions<AppSettings> _options;
 
-        public SignalRNotifier(IHubContext<MainHub> hubContext, DatabaseService databaseService, ILogger<SignalRNotifier> logger)
+        public SignalRNotifier(IHubContext<MainHub> hubContext, DatabaseService databaseService, ILogger<SignalRNotifier> logger, ISkipListProvider skipListProvider, IOptions<AppSettings> options)
         {
             _hubContext = hubContext;
             _databaseService = databaseService;
             _logger = logger;
-            objs = databaseService.GetAllObjects() ?? new List<EntObject>();
+            _objs = databaseService.GetAllObjects() ?? new List<EntObject>();
             var keys = _databaseService.GetAllKeysValue();
             _logger.LogInformation("Keys {0}", keys.Count);
             foreach (var key in keys)
             {
                 _logger.LogInformation("{0}", key);
             }
-
+            _skipListProvider = skipListProvider;
+            _options = options;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                objs = _databaseService.GetAllObjects();
-                _logger.LogInformation("Trying send objects... Objs {0}, Groups {1}", objs.Count, MainHub._groups.Count);
+                _objs = _databaseService.GetAllObjects();
+                _logger.LogInformation("Trying send objects... Objs {0}", _objs.Count);
                 try
                 {
-                    foreach (EntObject obj in objs) //Для кожного об'єкту
+                    foreach (EntObject obj in _objs) //For each object
                     {
-                        if(ConsoleReader.ints.Contains(obj.Id)) //Пропускаємо об'єкт, якщо він відмічений в списку на пропуск
+                        if(_skipListProvider.ShouldSkip(obj.Id)) //Skip an object if it is marked in the skip list
                             continue;
-                        var keys = _databaseService.GetKeysByObj(obj); //Отримуємо всі ключі пов'язані з об'єктом
+                        var keys = _databaseService.GetKeysByObj(obj); //Get all keys associated with an object
                         foreach (var key in keys)
                         {
-                            if(MainHub._groups.ContainsKey(key.Value)) //Якщо група з назвою ключа існує, тоді відправляємо
-                                await _hubContext.Clients.Group(key.Value).SendAsync("ReceiveData", obj);
+                             await _hubContext.Clients.Group(key.Value).SendAsync("ReceiveData", obj);
                         }
                     }
                 }
@@ -55,7 +60,7 @@ namespace TechnicalTask.Service.Console
                     _logger.LogError(ex, "Error while sending group messages");
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken); //Раз в 10 секунд
+                await Task.Delay(TimeSpan.FromSeconds(_options.Value.UpdateIntervalSeconds), stoppingToken); //Every 10 seconds
             }
         }
     }
